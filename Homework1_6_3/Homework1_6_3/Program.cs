@@ -9,56 +9,63 @@ namespace Homework1_6_3
 {
     class Program
     {
-        const string CaseAddPlayer = "1";
-        const string CaseBanPlayer = "2";
-        const string CaseUnbanPlayer = "3";
-        const string CaseDeletePlayer = "4";
-        const string CaseUpdatePlayer = "5";
-        const string CaseShowAllPlayers = "6";
-        const string CaseExit = "7";
-
         static void Main(string[] args)
         {
+            const string CommandCaseAddPlayer = "1";
+            const string CommandCaseBanPlayer = "2";
+            const string CommandCaseUnbanPlayer = "3";
+            const string CommandCaseDeletePlayer = "4";
+            const string CommandCaseUpdatePlayer = "5";
+            const string CommandCaseShowAllPlayers = "6";
+            const string CommandCaseExit = "7";
+
             bool isWork = true;
-            DataBase dataBase = new DataBase(); 
+            Database database = new Database(); 
 
             while (isWork)
             {
                 Console.Clear();
-                Console.WriteLine(CaseAddPlayer + ". Добавить игрока");
-                Console.WriteLine(CaseBanPlayer + ". Забанить игрока");
-                Console.WriteLine(CaseUnbanPlayer + ". Разбанить игрока");
-                Console.WriteLine(CaseDeletePlayer + ". Удалить игрока");
-                Console.WriteLine(CaseUpdatePlayer + ". Повысить уровень игрока");
-                Console.WriteLine(CaseShowAllPlayers + ". Вывести всех игроков");
-                Console.WriteLine(CaseExit + ". Выход");
+                Console.WriteLine(CommandCaseAddPlayer + ". Добавить игрока");
+                Console.WriteLine(CommandCaseBanPlayer + ". Забанить игрока");
+                Console.WriteLine(CommandCaseUnbanPlayer + ". Разбанить игрока");
+                Console.WriteLine(CommandCaseDeletePlayer + ". Удалить игрока");
+                Console.WriteLine(CommandCaseUpdatePlayer + ". Повысить уровень игрока");
+                Console.WriteLine(CommandCaseShowAllPlayers + ". Вывести всех игроков");
+                Console.WriteLine(CommandCaseExit + ". Выход");
 
                 Console.Write("Введите команду: ");
                 string command = Console.ReadLine();
 
                 switch (command)
                 {
-                    case CaseAddPlayer:
-                        dataBase.AddPlayer();
+                    case CommandCaseAddPlayer:
+                        database.AddPlayer();
                         break;
-                    case CaseBanPlayer:
-                        dataBase.BanPlayer();
+
+                    case CommandCaseBanPlayer:
+                        database.BanPlayer();
                         break;
-                    case CaseUnbanPlayer:
-                        dataBase.UnbanPlayer();
+
+                    case CommandCaseUnbanPlayer:
+                        database.UnbanPlayer();
                         break;
-                    case CaseDeletePlayer:
-                        dataBase.DeletePlayer();
+
+                    case CommandCaseDeletePlayer:
+                        database.DeletePlayer();
                         break;
-                    case CaseUpdatePlayer:
-                        dataBase.UpdatePlayer();
+
+                    case CommandCaseUpdatePlayer:
+                        database.UpdatePlayer();
                         break;
-                    case CaseShowAllPlayers:
-                        dataBase.ShowAllPlayers();
+
+                    case CommandCaseShowAllPlayers:
+                        database.ShowAllPlayers();
                         break;
-                    case CaseExit:
+
+                    case CommandCaseExit:
                         isWork = false;
                         break;
+
                     default:
                         Console.WriteLine("Введена неверная команда");
                         break;
@@ -85,13 +92,14 @@ namespace Homework1_6_3
         }
     }
 
-    class DataBase
+    class Database
     {
         const int IncorrectValue = -1;
+
         private int _countIdentityNumber;
         private List<Player> players = new List<Player>();
 
-        public DataBase ()
+        public Database ()
         {
             _countIdentityNumber = 1;
         }
@@ -99,13 +107,15 @@ namespace Homework1_6_3
         private int SearchPlayerIndex()
         {
             Console.Write("Идентификационный номер игрока: ");
-            int identityNumber = Convert.ToInt32(Console.ReadLine());
 
-            for (int i = 0; i < players.Count; i++)
+            if (int.TryParse(Console.ReadLine(), out int identityNumber))
             {
-                if (players[i].IdentityNumber == identityNumber)
+                for (int i = 0; i < players.Count; i++)
                 {
-                    return i;
+                    if (players[i].IdentityNumber == identityNumber)
+                    {
+                        return i;
+                    }
                 }
             }
 
@@ -151,32 +161,25 @@ namespace Homework1_6_3
 
         public void BanPlayer()
         {
-            BanMode(true);
+            int playerIndex = SearchPlayerIndex();
+            bool isBan = true;
+
+            if (playerIndex != IncorrectValue)
+            {
+                players[playerIndex].IsBanned = isBan;
+                Console.WriteLine("Игрок " + players[playerIndex].Name + " забанен");
+            }
         }
 
         public void UnbanPlayer()
         {
-            BanMode(false);
-        }
-
-        private void BanMode(bool isBan)
-        {
             int playerIndex = SearchPlayerIndex();
-            string banMode;
+            bool isBan = false;
 
             if (playerIndex != IncorrectValue)
             {
-                if (isBan)
-                {
-                    banMode = "забанен";
-                }
-                else
-                {
-                    banMode = "разбанен";
-                }
-
                 players[playerIndex].IsBanned = isBan;
-                Console.WriteLine("Игрок " + players[playerIndex].Name + " " + banMode);
+                Console.WriteLine("Игрок " + players[playerIndex].Name + " разбанен");
             }
         }
 
