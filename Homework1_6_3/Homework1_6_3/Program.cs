@@ -80,8 +80,8 @@ namespace Homework1_6_3
     {
         public int IdentityNumber { get; private set; }
         public string Name { get; private set; }
-        public  int Level { get; set; }
-        public  bool IsBanned { get; set; }
+        public int Level { get; private set; }
+        public bool IsBanned { get; private set; }
 
         public Player(int identityNumber, string name, int level=1, bool isBanned=false)
         {
@@ -90,12 +90,25 @@ namespace Homework1_6_3
             Level = level;
             IsBanned = isBanned;
         }
+
+        public void Ban()
+        {
+            IsBanned = true;
+        }
+
+        public void Unban()
+        {
+            IsBanned = false;
+        }
+
+        public void Update()
+        {
+            Level++;
+        }
     }
 
     class Database
     {
-        const int IncorrectValue = -1;
-
         private int _countIdentityNumber;
         private List<Player> players = new List<Player>();
 
@@ -103,26 +116,6 @@ namespace Homework1_6_3
         {
             _countIdentityNumber = 1;
         }
-
-        private int SearchPlayerIndex()
-        {
-            Console.Write("Идентификационный номер игрока: ");
-
-            if (int.TryParse(Console.ReadLine(), out int identityNumber))
-            {
-                for (int i = 0; i < players.Count; i++)
-                {
-                    if (players[i].IdentityNumber == identityNumber)
-                    {
-                        return i;
-                    }
-                }
-            }
-
-            Console.WriteLine("Игрок не найден");
-            return IncorrectValue;
-        }
-
 
         public void AddPlayer()
         {
@@ -159,49 +152,60 @@ namespace Homework1_6_3
             }
         }
 
+        private bool TryGetPlayer(out Player player)
+        {
+            Console.Write("Идентификационный номер игрока: ");
+
+            if (int.TryParse(Console.ReadLine(), out int identityNumber))
+            {
+                for (int i = 0; i < players.Count; i++)
+                {
+                    if (players[i].IdentityNumber == identityNumber)
+                    {
+                        player = players[i];
+                        return true;
+                    }
+                }
+            }
+
+            Console.WriteLine("Игрок не найден");
+            player = null;
+            return false;
+        }
+
         public void BanPlayer()
         {
-            int playerIndex = SearchPlayerIndex();
-            bool isBan = true;
-
-            if (playerIndex != IncorrectValue)
+            if (TryGetPlayer(out Player bannedPlayer))
             {
-                players[playerIndex].IsBanned = isBan;
-                Console.WriteLine("Игрок " + players[playerIndex].Name + " забанен");
+                bannedPlayer.Ban();
+                Console.WriteLine("Игрок " + bannedPlayer.Name + " забанен");
             }
         }
 
         public void UnbanPlayer()
         {
-            int playerIndex = SearchPlayerIndex();
-            bool isBan = false;
-
-            if (playerIndex != IncorrectValue)
+            if (TryGetPlayer(out Player unbannedPlayer))
             {
-                players[playerIndex].IsBanned = isBan;
-                Console.WriteLine("Игрок " + players[playerIndex].Name + " разбанен");
+                unbannedPlayer.Unban();
+                Console.WriteLine("Игрок " + unbannedPlayer.Name + " разбанен");
             }
         }
 
         public void UpdatePlayer()
         {
-            int playerIndex = SearchPlayerIndex();
-
-            if (playerIndex != IncorrectValue)
+            if (TryGetPlayer(out Player updatedPlayer))
             {
-                players[playerIndex].Level++;
-                Console.WriteLine("Уровень игрока " + players[playerIndex].Name + " - " + players[playerIndex].Level);
+                updatedPlayer.Update();
+                Console.WriteLine("Уровень игрока " + updatedPlayer.Name + " - " + updatedPlayer.Level);
             }
         }
 
         public void DeletePlayer()
         {
-            int playerIndex = SearchPlayerIndex();
-
-            if (playerIndex != IncorrectValue)
+            if (TryGetPlayer(out Player deletedPlayer))
             {
-                Console.WriteLine("Игрок " + players[playerIndex].Name + " удален");
-                players.RemoveAt(playerIndex);
+                Console.WriteLine("Игрок " + deletedPlayer.Name + " удален");
+                players.Remove(deletedPlayer);
             }
         }
     }
